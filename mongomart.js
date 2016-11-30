@@ -93,7 +93,7 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
         });
     });
 
-
+    // Lab 2: the route for text search
     router.get("/search", function(req, res) {
         "use strict";
 

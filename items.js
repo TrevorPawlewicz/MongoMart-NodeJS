@@ -61,7 +61,7 @@ function ItemDAO(database) {
         // Each doc must stipulate a stage opperator:
 
         this.db.collection("item").aggregate([
-            { $match: { category: { $ne: null } } },
+            { $match: { "category": { $ne: null } } },
             { $group: {
                 _id: "$category",
                 num: { $sum: 1 }
@@ -72,7 +72,7 @@ function ItemDAO(database) {
             var allCategoriesCount = 0;
 
             for (var i = 0; i < docs.length; i++) {
-                allCategoriesCount = allCategoriesCount + docs[i].num;
+                allCategoriesCount += docs[i].num;
             }
 
             allCategoriesObj.num = allCategoriesCount;
@@ -147,12 +147,12 @@ function ItemDAO(database) {
          // TODO Include the following line in the appropriate
          // place within your code to pass the count to the callback.
 
-         var queryDoc = { category: category };
+         var queryDoc = { "category": category };
 
          if (category === "All") {
-             queryDoc = {};          // Don't filter on "All"
+             queryDoc = {};
          }
-         
+
          this.db.collection("item").find(queryDoc).count(function(error, numItems) {
              if (error) {
                  console.log(error);
@@ -165,9 +165,12 @@ function ItemDAO(database) {
 
     this.searchItems = function(query, page, itemsPerPage, callback) {
         "use strict";
-
+        console.log("query = " + query);
+        console.log("page = " + page);
+        console.log("itemsPerPage = " + itemsPerPage);
+        console.log("callback = " + callback);
         /*
-         * TODO-lab2A
+         * TODO-lab2A = 7
          *
          * LAB #2A: Implement searchItems()
          *
@@ -190,18 +193,27 @@ function ItemDAO(database) {
          *
          */
 
-        var item = this.createDummyItem();
-        var items = [];
-        for (var i=0; i<5; i++) {
-            items.push(item);
-        }
+        // First use in shell on items collection:
+        // db.item.createIndex ({ title: "text", slogan: "text", description: "text"});
 
-        // TODO-lab2A Replace all code above (in this method).
+        var queryDoc = { $text: { $search: query } };
 
-        // TODO Include the following line in the appropriate
-        // place within your code to pass the items for the selected page
-        // of search results to the callback.
-        callback(items);
+        console.log("queryDoc = " + queryDoc);
+
+        this.db.collection("item").find(queryDoc)
+                                    .sort({ _id: 1 })
+                                    .limit(itemsPerPage)
+                                    .skip(page * itemsPerPage)
+                                    .toArray(function(error, items) {
+                                        if (error) {
+                                            console.log(error);
+                                            throw error;
+                                        }
+                                        assert.equal(error, null);
+                                        callback(items);
+                                    }
+        );
+
     }
 
 
@@ -223,7 +235,16 @@ function ItemDAO(database) {
         * simply do this in the mongo shell.
         */
 
-        callback(numItems);
+        var queryDoc = { $text: { $search: query } };
+
+        this.db.collection("item").find(queryDoc).count(function(error, numItems) {
+            if (error) {
+                console.log(error);
+                throw error;
+            }
+            assert.equal(error, null);
+            callback(numItems);
+        });
     }
 
 
