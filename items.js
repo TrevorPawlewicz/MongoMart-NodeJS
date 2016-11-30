@@ -68,7 +68,7 @@ function ItemDAO(database) {
             } },
             { $sort: { _id: 1 } } // 1 = ascending
         ]).toArray(function(error, docs) {
-            assert.equal(error, null);
+            assert.equal(null, error);
             var allCategoriesCount = 0;
 
             for (var i = 0; i < docs.length; i++) {
@@ -118,7 +118,7 @@ function ItemDAO(database) {
                                         .limit(itemsPerPage)
                                         .skip(page * itemsPerPage)
                                         .toArray(function(error, items) {
-             assert.equal(error, null);
+             assert.equal(null, error);
              callback(items);
          });
     }
@@ -209,7 +209,7 @@ function ItemDAO(database) {
                                             console.log(error);
                                             throw error;
                                         }
-                                        assert.equal(error, null);
+                                        assert.equal(null, error);
                                         callback(items);
                                     }
         );
@@ -242,7 +242,7 @@ function ItemDAO(database) {
                 console.log(error);
                 throw error;
             }
-            assert.equal(error, null);
+            assert.equal(null, error);
             callback(numItems);
         });
     }
@@ -266,7 +266,7 @@ function ItemDAO(database) {
          this.db.collection("item").find(queryDoc)
                                         .limit(1)
                                         .next(function(error, item) {
-                                             assert.equal(error, null);
+                                             assert.equal(null, error);
                                              callback(item);
                                         });
     }
@@ -308,13 +308,16 @@ function ItemDAO(database) {
 
         // TODO replace the following two lines with your code that will
         // update the document with a new review.
-        var doc = this.createDummyItem();
-        doc.reviews = [reviewDoc];
+        var filterDoc = { "_id": itemId };
+        var updateDoc = { $push: { "reviews": reviewDoc } };
 
         // TODO Include the following line in the appropriate
         // place within your code to pass the updated doc to the
         // callback.
-        callback(doc);
+        this.db.collection("item").updateOne(filterDoc, updateDoc, function(error, item) {
+            assert.equal(null, error);
+            callback(item);
+        });
     }
 
 

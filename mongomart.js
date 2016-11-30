@@ -124,7 +124,7 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
     // before each portion of the url path that should be interpreted by Express
     // as a variable.
 
-    // Lab 3: view for a single item
+    // Lab 3: GET view for a single item
     router.get("/item/:itemId", function(req, res) {
         "use strict";
 
@@ -172,7 +172,7 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
         });
     });
 
-
+    // Lab 4: POST review a single item
     router.post("/item/:itemId/reviews", function(req, res) {
         "use strict";
 
