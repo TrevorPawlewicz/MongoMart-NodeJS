@@ -89,9 +89,23 @@ function CartDAO(database) {
          *
          */
 
-        callback(null);
+         var queryDoc = {
+             "userId": userId,
+             "items._id": itemId
+         };
 
-        // TODO-lab6 Replace all code above (in this method).
+         this.db.collection("cart").find({ queryDoc, { "items.$": 1 })
+            .limit(1)
+            .next(function(error, item) {
+                assert.equal(null, error);
+
+                if (item != null) {
+                    item = item.items[0];
+                }
+                
+                console.log(item);
+                callback(item);
+         });
     }
 
 

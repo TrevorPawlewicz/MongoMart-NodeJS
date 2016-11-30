@@ -196,7 +196,7 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
         res.redirect("/user/" + USERID + "/cart");
     });
 
-    // Lab 6: 
+    // Lab 5:
     router.get("/user/:userId/cart", function(req, res) {
         "use strict";
 
@@ -213,7 +213,7 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
         });
     });
 
-
+    // Lab 6 (challenge):
     router.post("/user/:userId/cart/items/:itemId", function(req, res) {
         "use strict";
 
