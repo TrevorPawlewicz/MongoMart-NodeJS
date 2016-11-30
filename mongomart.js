@@ -188,17 +188,15 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
 
 
     /*
-     *
-     * Since we are not maintaining user sessions in this application, any interactions with
-     * the cart will be based on a single cart associated with the the USERID constant we have
-     * defined above.
-     *
+     * Since we are not maintaining user sessions in this application,
+     * any interactions with the cart will be based on a single cart associated
+     * with the the USERID constant we have defined above.
      */
     router.get("/cart", function(req, res) {
         res.redirect("/user/" + USERID + "/cart");
     });
 
-
+    // Lab 6: 
     router.get("/user/:userId/cart", function(req, res) {
         "use strict";
 

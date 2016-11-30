@@ -68,7 +68,7 @@ function ItemDAO(database) {
             } },
             { $sort: { _id: 1 } } // 1 = ascending
         ]).toArray(function(error, docs) {
-            assert.equal(null, error);
+            assert.equal(null, error); // throw error if it is NOT null
             var allCategoriesCount = 0;
 
             for (var i = 0; i < docs.length; i++) {
@@ -154,10 +154,7 @@ function ItemDAO(database) {
          }
 
          this.db.collection("item").find(queryDoc).count(function(error, numItems) {
-             if (error) {
-                 console.log(error);
-                 throw error;
-             }
+            assert.equal(null, error);
              callback(numItems);
          });
     }
@@ -205,10 +202,6 @@ function ItemDAO(database) {
                                     .limit(itemsPerPage)
                                     .skip(page * itemsPerPage)
                                     .toArray(function(error, items) {
-                                        if (error) {
-                                            console.log(error);
-                                            throw error;
-                                        }
                                         assert.equal(null, error);
                                         callback(items);
                                     }
@@ -238,11 +231,7 @@ function ItemDAO(database) {
         var queryDoc = { $text: { $search: query } };
 
         this.db.collection("item").find(queryDoc).count(function(error, numItems) {
-            if (error) {
-                console.log(error);
-                throw error;
-            }
-            assert.equal(null, error);
+            assert.equal(null, error); // throw error if it is NOT null
             callback(numItems);
         });
     }
