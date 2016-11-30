@@ -261,14 +261,14 @@ function ItemDAO(database) {
          *
          */
 
-        var item = this.createDummyItem();
+         var queryDoc = { _id: itemId };
 
-        // TODO-lab3 Replace all code above (in this method).
-
-        // TODO Include the following line in the appropriate
-        // place within your code to pass the matching item
-        // to the callback.
-        callback(item);
+         this.db.collection("item").find(queryDoc)
+                                        .limit(1)
+                                        .next(function(error, item) {
+                                             assert.equal(error, null);
+                                             callback(item);
+                                        });
     }
 
 

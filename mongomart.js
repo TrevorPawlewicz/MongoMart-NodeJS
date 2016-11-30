@@ -120,7 +120,11 @@ MongoClient.connect('mongodb://localhost:27017/mongomart', function(err, db) {
         });
     });
 
+    // In Express, you may define a route with url parameters by placing a ":"
+    // before each portion of the url path that should be interpreted by Express
+    // as a variable.
 
+    // Lab 3: view for a single item
     router.get("/item/:itemId", function(req, res) {
         "use strict";
 
