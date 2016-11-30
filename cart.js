@@ -94,7 +94,7 @@ function CartDAO(database) {
              "items._id": itemId
          };
 
-         this.db.collection("cart").find({ queryDoc, { "items.$": 1 })
+         this.db.collection("cart").find( queryDoc, { "items.$": 1 })
             .limit(1)
             .next(function(error, item) {
                 assert.equal(null, error);
@@ -102,7 +102,7 @@ function CartDAO(database) {
                 if (item != null) {
                     item = item.items[0];
                 }
-                
+
                 console.log(item);
                 callback(item);
          });
@@ -194,17 +194,38 @@ function CartDAO(database) {
         * https://docs.mongodb.org/manual/reference/operator/update/positional/
         *
         */
-
-        var userCart = {
-            userId: userId,
-            items: []
-        }
-        var dummyItem = this.createDummyItem();
-        dummyItem.quantity = quantity;
-        userCart.items.push(dummyItem);
-        callback(userCart);
-
+        // ------------ original code -------------------
+        // var userCart = {
+        //     userId: userId,
+        //     items: []
+        // }
+        // var dummyItem = this.createDummyItem();
+        // dummyItem.quantity = quantity;
+        // userCart.items.push(dummyItem);
+        // callback(userCart);
+        // ------------ original code -------------------
         // TODO-lab7 Replace all code above (in this method).
+
+        var updateDoc = {};
+
+        if (quantity == 0) {
+            updateDoc = { "$pull": { items: { _id: itemId } } };
+        } else {
+            updateDoc = { "$set": { "items.$.quantity": quantity } };
+        }
+
+        this.db.collection("cart").findOneAndUpdate(
+            {
+                "userId": userId,
+                "items._id": itemId
+            },
+            updateDoc,
+            { returnOriginal: false },
+            function(err, result) {
+                assert.equal(null, err);
+                console.log(result.value);
+                callback(result.value);
+        });
 
     }
 
