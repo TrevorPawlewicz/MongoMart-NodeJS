@@ -16,8 +16,11 @@
 
 
 var MongoClient = require('mongodb').MongoClient,
-    assert = require('assert');
+    assert      = require('assert');
 
+// ItemDAO --> Item data access object
+// The DAO, items, is used throughout mongomart.js to implement several of the
+// routes in this application:
 
 function ItemDAO(database) {
     "use strict";
@@ -52,20 +55,30 @@ function ItemDAO(database) {
         *
         */
 
-        var categories = [];
-        var category = {
-            _id: "All",
-            num: 9999
-        };
+        var allCategoriesObj = { _id: "All", num: 0 };
 
-        categories.push(category)
+        // aggregation pipeline -> array with docs as elements.
+        // Each doc must stipulate a stage opperator:
 
-        // TODO-lab1A Replace all code above (in this method).
+        this.db.collection("item").aggregate([
+            { $match: { category: { $ne: null } } },
+            { $group: {
+                _id: "$category",
+                num: { $sum: 1 }
+            } },
+            { $sort: { _id: 1 } } // 1 = ascending
+        ]).toArray(function(error, docs) {
+            assert.equal(error, null);
+            var allCategoriesCount = 0;
 
-        // TODO Include the following line in the appropriate
-        // place within your code to pass the categories array to the
-        // callback.
-        callback(categories);
+            for (var i = 0; i < docs.length; i++) {
+                allCategoriesCount = allCategoriesCount + docs[i].num;
+            }
+
+            allCategoriesObj.num = allCategoriesCount;
+            docs.unshift(allCategoriesObj);
+            callback(docs);
+        });
     }
 
 
@@ -94,18 +107,20 @@ function ItemDAO(database) {
          *
          */
 
-        var pageItem = this.createDummyItem();
-        var pageItems = [];
-        for (var i=0; i<5; i++) {
-            pageItems.push(pageItem);
-        }
+         var queryDoc = { "category": category };
 
-        // TODO-lab1B Replace all code above (in this method).
+         if (category == "All") {
+             queryDoc = {};
+         }
 
-        // TODO Include the following line in the appropriate
-        // place within your code to pass the items for the selected page
-        // to the callback.
-        callback(pageItems);
+         this.db.collection("item").find(queryDoc)
+                                        .sort({ _id: 1 })
+                                        .limit(itemsPerPage)
+                                        .skip(page * itemsPerPage)
+                                        .toArray(function(error, items) {
+             assert.equal(error, null);
+             callback(items);
+         });
     }
 
 
@@ -131,7 +146,20 @@ function ItemDAO(database) {
 
          // TODO Include the following line in the appropriate
          // place within your code to pass the count to the callback.
-        callback(numItems);
+
+         var queryDoc = { category: category };
+
+         if (category === "All") {
+             queryDoc = {};          // Don't filter on "All"
+         }
+         
+         this.db.collection("item").find(queryDoc).count(function(error, numItems) {
+             if (error) {
+                 console.log(error);
+                 throw error;
+             }
+             callback(numItems);
+         });
     }
 
 
